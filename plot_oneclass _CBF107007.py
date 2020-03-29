@@ -16,21 +16,24 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager
 from sklearn import svm
 
-xx, yy = np.meshgrid(np.linspace(-5, 5, 500), np.linspace(-5, 5, 500))
+xx, yy = np.meshgrid(np.linspace(-10, 10, 500), np.linspace(-10, 10, 500))
 # Generate train data
 X = 0.3 * np.random.randn(100, 2)
-X_train = np.r_[X + 2, X - 2]
+X_train = np.r_[X +5, X -5]
+X_train1 = np.r_[X, X ]
 # Generate some regular novel observations
 X = 0.3 * np.random.randn(20, 2)
-X_test = np.r_[X + 2, X - 2]
+X_test = np.r_[X + 5, X - 5]
+X_test1 = np.r_[X , X]
 # Generate some abnormal novel observations
 X_outliers = np.random.uniform(low=-4, high=4, size=(20, 2))
 
 # fit the model
-clf = svm.OneClassSVM(nu=0.1, kernel="poly", gamma=0.1)
+clf = svm.OneClassSVM(nu=0.1, kernel="linear", gamma=0.1)
 clf.fit(X_train)
 y_pred_train = clf.predict(X_train)
 y_pred_test = clf.predict(X_test)
+y_pred_test1 = clf.predict(X_test1)
 y_pred_outliers = clf.predict(X_outliers)
 n_error_train = y_pred_train[y_pred_train == -1].size
 n_error_test = y_pred_test[y_pred_test == -1].size
@@ -47,13 +50,17 @@ plt.contourf(xx, yy, Z, levels=[0, Z.max()], colors='palevioletred')
 
 s = 40
 b1 = plt.scatter(X_train[:, 0], X_train[:, 1], c='white', s=s, edgecolors='k')
+b4 = plt.scatter(X_train1[:, 0], X_train1[:, 1], c='white', s=s, edgecolors='k')
 b2 = plt.scatter(X_test[:, 0], X_test[:, 1], c='blueviolet', s=s,
                  edgecolors='k')
+b3 = plt.scatter(X_test1[:, 0], X_test1[:, 1], c='blueviolet', s=s,
+                 edgecolors='k')
+
 c = plt.scatter(X_outliers[:, 0], X_outliers[:, 1], c='gold', s=s,
                 edgecolors='k')
 plt.axis('tight')
-plt.xlim((-5, 5))
-plt.ylim((-5, 5))
+plt.xlim((-10, 10))
+plt.ylim((-10, 10))
 plt.legend([a.collections[0], b1, b2, c],
            ["learned frontier", "training observations",
             "new regular observations", "new abnormal observations"],
